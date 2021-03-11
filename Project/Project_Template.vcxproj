@@ -145,6 +145,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Additional Files\objmesh.cpp" />
+    <ClCompile Include="Additional Files\plane.cpp" />
+    <ClCompile Include="Additional Files\teapot.cpp" />
+    <ClCompile Include="Additional Files\torus.cpp" />
+    <ClCompile Include="Additional Files\trianglemesh.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
@@ -152,10 +157,16 @@
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\basic_uniform.frag" />
-    <None Include="shader\basic_uniform.vert" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="Additional Files\aabb.h" />
+    <ClInclude Include="Additional Files\drawable.h" />
+    <ClInclude Include="Additional Files\glutils.h" />
+    <ClInclude Include="Additional Files\objmesh.h" />
+    <ClInclude Include="Additional Files\plane.h" />
+    <ClInclude Include="Additional Files\teapot.h" />
+    <ClInclude Include="Additional Files\teapotdata.h" />
+    <ClInclude Include="Additional Files\torus.h" />
+    <ClInclude Include="Additional Files\trianglemesh.h" />
+    <ClInclude Include="Additional Files\utils.h" />
     <ClInclude Include="helper\glslprogram.h" />
     <ClInclude Include="helper\glutils.h" />
     <ClInclude Include="helper\scene.h" />
@@ -163,6 +174,14 @@
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
     <ClInclude Include="scenebasic_uniform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\Shader_BlinnPhong.frag" />
+    <None Include="shader\Shader_BlinnPhong.vert" />
+    <None Include="shader\Shader_Texture.frag" />
+    <None Include="shader\Shader_Texture.vert" />
+    <None Include="shader\Shader_Toons.frag" />
+    <None Include="shader\Shader_Toons.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,109 +1,128 @@
 #include "scenebasic_uniform.h"
 
-#include <cstdio>
-#include <cstdlib>
-
-#include <string>
-using std::string;
-
+#include <sstream>
 #include <iostream>
 using std::cerr;
 using std::endl;
 
-#include "helper/glutils.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
+using glm::mat4;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f) {}
+SceneBasic_Uniform::SceneBasic_Uniform() : plane(10.0f, 10.0f, 100, 100)
+{
+    //mesh = ObjMesh::load("../Project/media/pig_triangulated.obj", true);
+    BackGround = ObjMesh::load("../Project/media/BackGround.obj", true);
+}
 
 void SceneBasic_Uniform::initScene()
 {
     compile();
+    glEnable(GL_DEPTH_TEST);
 
-    std::cout << std::endl;
+    view = glm::lookAt(vec3(0.5f, 0.75f, 0.75f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    projection = mat4(1.0f);
 
-    prog.printActiveUniforms();
+    float x, z;
+    std::stringstream name;
+    name << "Lights.Position";
+    x = 2.0f * cosf((glm::two_pi<float>() / 3));
+    z = 2.0f * sinf((glm::two_pi<float>() / 3));
+    Shader_BlinnPhong.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z +
+        1.0f, 1.0f));
 
-    /////////////////// Create the VBO ////////////////////
-    float positionData[] = {
-        -0.8f, -0.8f, 0.0f,
-         0.8f, -0.8f, 0.0f,
-         0.0f,  0.8f, 0.0f };
-    float colorData[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f };
+    Shader_BlinnPhong.setUniform("Lights.L", vec3(1.0f, 0.0f, 0.0f));
 
-    // Create and populate the buffer objects
-    GLuint vboHandles[2];
-    glGenBuffers(2, vboHandles);
-    GLuint positionBufferHandle = vboHandles[0];
-    GLuint colorBufferHandle = vboHandles[1];
-
-    glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), positionData, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colorData, GL_STATIC_DRAW);
-
-    // Create and set-up the vertex array object
-    glGenVertexArrays( 1, &vaoHandle );
-    glBindVertexArray(vaoHandle);
-
-    glEnableVertexAttribArray(0);  // Vertex position
-    glEnableVertexAttribArray(1);  // Vertex color
-
-    #ifdef __APPLE__
-        glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-        glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
-
-        glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-        glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 0, (GLubyte *)NULL );
-    #else
-    		glBindVertexBuffer(0, positionBufferHandle, 0, sizeof(GLfloat)*3);
-    		glBindVertexBuffer(1, colorBufferHandle, 0, sizeof(GLfloat)*3);
-
-    		glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
-    		glVertexAttribBinding(0, 0);
-    		glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 0);
-    	  glVertexAttribBinding(1, 1);
-    #endif
-    glBindVertexArray(0);
+    Shader_BlinnPhong.setUniform("Light.La", 0.8f, 0.8f, 0.8f);
 }
 
 void SceneBasic_Uniform::compile()
 {
-	try {
-		prog.compileShader("shader/basic_uniform.vert");
-		prog.compileShader("shader/basic_uniform.frag");
-		prog.link();
-		prog.use();
-	} catch (GLSLProgramException &e) {
-		cerr << e.what() << endl;
-		exit(EXIT_FAILURE);
-	}
+    //BlinnPhong Shader
+    try {
+        Shader_BlinnPhong.compileShader("shader/Shader_BlinnPhong.vert");
+        Shader_BlinnPhong.compileShader("shader/Shader_BlinnPhong.frag");
+        Shader_BlinnPhong.link();
+        Shader_BlinnPhong.use();
+    }
+    catch (GLSLProgramException& e)
+    {
+        cerr << e.what() << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    ////Toons Shader
+    //try {
+    //    Shader_Toon.compileShader("shader/basic_uniform.vert");
+    //    Shader_Toon.compileShader("shader/basic_uniform.frag");
+    //    Shader_Toon.link();
+    //}
+    //catch (GLSLProgramException& e)
+    //{
+    //    cerr << e.what() << endl;
+    //    exit(EXIT_FAILURE);
+    //}
+
+    ////Texture Shader
+    //try {
+    //    Shader_Texture.compileShader("shader/basic_uniform.vert");
+    //    Shader_Texture.compileShader("shader/basic_uniform.frag");
+    //    Shader_Texture.link();
+    //}
+    //catch (GLSLProgramException& e)
+    //{
+    //    cerr << e.what() << endl;
+    //    exit(EXIT_FAILURE);
+    //}
+
 }
 
-void SceneBasic_Uniform::update( float t )
+void SceneBasic_Uniform::update(float t)
 {
-	//update your angle here
+    
 }
 
 void SceneBasic_Uniform::render()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    //create the rotation matrix here and update the uniform in the shader 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBindVertexArray(vaoHandle);
-    glDrawArrays(GL_TRIANGLES, 0, 3 );
+    Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+    Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    Shader_BlinnPhong.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
+    Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
 
-    glBindVertexArray(0);
+    model = mat4(1.0f);
+    model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices();
+    BackGround->render();
+
+    Shader_BlinnPhong.setUniform("Material.Kd", 0.1f, 0.1f, 0.1f);
+    Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    Shader_BlinnPhong.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
+    Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
+    model = mat4(1.0f);
+
+    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
+    setMatrices();
+    plane.render();
+}
+
+void SceneBasic_Uniform::setMatrices()
+{
+    mat4 mv = view * model;
+
+    Shader_BlinnPhong.setUniform("ModelViewMatrix", mv);
+
+    Shader_BlinnPhong.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+
+    Shader_BlinnPhong.setUniform("MVP", projection * mv);
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
 {
+    glViewport(0, 0, w, h);
     width = w;
     height = h;
-    glViewport(0,0,w,h);
+    projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
 }

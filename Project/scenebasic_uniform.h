@@ -6,12 +6,33 @@
 #include <glad/glad.h>
 #include "helper/glslprogram.h"
 
+#include "Additional Files/teapot.h"
+
+#include "Additional Files/aabb.h"
+#include "Additional Files/utils.h"
+#include "Additional Files/objmesh.h"
+#include "Additional files/plane.h"
+#include "helper/glutils.h"
+
+#include <glm/glm.hpp>
+
+using namespace std;
+
 class SceneBasic_Uniform : public Scene
 {
 private:
-    GLuint vaoHandle;
     GLSLProgram prog;
-    float angle;
+
+    GLSLProgram Shader_BlinnPhong;
+    GLSLProgram Shader_Toon;
+    GLSLProgram Shader_Texture;
+
+    Plane plane;
+    unique_ptr<ObjMesh> mesh;
+    unique_ptr<ObjMesh> BackGround;
+
+
+    void setMatrices();
 
     void compile();
 
@@ -19,7 +40,7 @@ public:
     SceneBasic_Uniform();
 
     void initScene();
-    void update( float t );
+    void update(float t);
     void render();
     void resize(int, int);
 };
