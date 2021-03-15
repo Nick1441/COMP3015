@@ -12,9 +12,10 @@ using glm::mat4;
 using glm::vec4;
 using glm::mat3;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.0f, 50.0f, 1, 1)
+SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.0f, 50.0f, 1, 1), teapot(14, glm::mat4(1.0f))
 {
-    mesh = ObjMesh::load("../Project/media/Truck.obj", true);
+    mesh = ObjMesh::load("../Project/media/Jeep2.obj", true);
+    StreetLamp1 = ObjMesh::load("../Project/media/Lamp.obj", true);
 }
 
 void SceneBasic_Uniform::initScene()
@@ -26,15 +27,17 @@ void SceneBasic_Uniform::initScene()
         1.0f, 0.0f));
     
 
-
     //LIGHT SETTINGS
 
-    //Indiveidual lights.
+    //Spot lights.
     projection = mat4(1.0f);
-    Shader_BlinnPhong.setUniform("Spot.L", vec3(0.0f, 0.9f, 0.0f));
-    Shader_BlinnPhong.setUniform("Spot.La", vec3(0.9f));
-    Shader_BlinnPhong.setUniform("Spot.Exponent", 100.0f); //Blurry Around Circle
-    Shader_BlinnPhong.setUniform("Spot.CutOff", glm::radians(15.0f));  //Size of circle
+    Shader_BlinnPhong.setUniform("Spot.L", vec3(0.0f, 0.0f, 0.9f));
+    Shader_BlinnPhong.setUniform("Spot.La", vec3(0.2f));
+    Shader_BlinnPhong.setUniform("Spot.Exponent", 10.0f); //Blurry Around Circle
+    Shader_BlinnPhong.setUniform("Spot.CutOff", glm::radians(5.0f));  //Size of circle
+
+
+        //Spot Light Settings
 
 
     //Spotlight lights.
@@ -51,9 +54,19 @@ void SceneBasic_Uniform::initScene()
 
     Shader_BlinnPhong.setUniform("Lights.La", 0.8f, 0.8f, 0.8f);
 
-    GLuint texID = Texture::loadTexture("../Project/media/texture/Truck.png");
+    //Jeep Texture
+    GLuint ID1 = Texture::loadTexture("../Project/media/texture/JeepV2.png");
+    
+    
+
+    //Street Lamp Texture
+    GLuint ID2 = Texture::loadTexture("../Project/media/texture/Lamp2.png");
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texID);
+    glBindTexture(GL_TEXTURE_2D, ID1);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ID2);
 }
 
 void SceneBasic_Uniform::compile()
@@ -79,47 +92,16 @@ void SceneBasic_Uniform::update(float t)
 
 void SceneBasic_Uniform::render()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //Directional Light for Moon, Light Shading Etc....
-    //Point Light, Car Light heading Outwards.
-    //SpotLight, Lamp Post, Will Fade in/out....
-    //Skybox, jungle type thing...
-    //Some sort of moving light somehow?
-
-
-
-
-    //Spot Light Settings
-    vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);
-    Shader_BlinnPhong.setUniform("Spot.Position", vec3(view * lightPos));
-    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-    Shader_BlinnPhong.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
-
-    //MESH RENDERING
-    Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
-    Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
-    Shader_BlinnPhong.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
-    Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.5f, -0.5f));
-    model = glm::scale(model, vec3(0.02f, 0.02f, 0.02f));
-    //model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
-    //model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-    setMatrices();
-    mesh->render();
+    RenderObject();
+    glFlush();
+    RenderObject2();
+    RenderOther();
+    //glFlush();
+    
 
     ////PLANE SETTINGS
-    Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
-    Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
-    Shader_BlinnPhong.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
-    Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
-    model = mat4(1.0f);
 
-    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
-    setMatrices();
-    plane.render();
+
 }
 
 void SceneBasic_Uniform::setMatrices()
@@ -139,4 +121,77 @@ void SceneBasic_Uniform::resize(int w, int h)
     width = w;
     height = h;
     projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
+}
+
+void SceneBasic_Uniform::RenderObject()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //Directional Light for Moon, Light Shading Etc....
+    //Point Light, Car Light heading Outwards.
+    //SpotLight, Lamp Post, Will Fade in/out....
+    //Skybox, jungle type thing...
+    //Some sort of moving light somehow?
+
+
+    Shader_BlinnPhong.setUniform("Pass", 1);
+
+    vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);
+    Shader_BlinnPhong.setUniform("Spot.Position", vec3(view * lightPos));
+
+    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+
+    
+
+    Shader_BlinnPhong.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+
+    //MESH RENDERING
+    Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+    Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    Shader_BlinnPhong.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
+    Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
+
+    
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, -0.5f, -0.5f));
+    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
+    model = glm::rotate(model, glm::radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices();
+    mesh->render();
+}
+
+void SceneBasic_Uniform::RenderObject2()
+{
+    Shader_BlinnPhong.setUniform("Pass", 2);
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(2.0f, -0.5f, -0.5f));
+    model = glm::scale(model, vec3(0.06f, 0.06f, 0.06f));
+    setMatrices();
+    StreetLamp1->render();
+
+}
+
+void SceneBasic_Uniform::RenderOther()
+{
+    Shader_BlinnPhong.setUniform("Pass", 0);
+    Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+    Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    Shader_BlinnPhong.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
+    Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
+    model = mat4(1.0f);
+
+    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
+    setMatrices();
+    plane.render();
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, 0.0f, -1.0f));
+    model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, vec3(0.2f, 0.2f, 0.2f));
+
+    setMatrices();
+    teapot.render();
 }

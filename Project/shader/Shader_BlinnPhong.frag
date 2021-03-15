@@ -5,7 +5,10 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 layout (location = 0) out vec4 FragColor;
-layout (binding = 0) uniform sampler2D Tex1;
+layout (binding = 0) uniform sampler2D ObjTex1;
+layout (binding = 1) uniform sampler2D ObjTex2;
+
+uniform int Pass;
 
 uniform struct LightInfo 
 {
@@ -93,10 +96,22 @@ vec3 BlinnPhongSpot(vec3 position, vec3 normal)
 	return ambient + spotScale * Spot.L * (diffuse + specular);
 }
 
-vec3 TextureMeth(vec3 position, vec3 normal)
+vec3 TextureMeth(vec3 position, vec3 normal, int i)
 {
+
 	//Texture Setting
-	vec3 texColor = texture(Tex1, TexCoord).rgb; //Extract Colour for each frag.
+	vec3 texColor = vec3(0.0f);
+
+	if (i == 1)
+	{
+		texColor = texture(ObjTex1, TexCoord).rgb;
+	}
+	if (i == 2)
+	{
+		texColor = texture(ObjTex2, TexCoord).rgb;
+	}
+
+	//vec3 texColor = texture(ObjTex1, TexCoord).rgb;
 
 	//Ambient
 	vec3 ambient = Lights.La * texColor;
@@ -119,12 +134,28 @@ vec3 TextureMeth(vec3 position, vec3 normal)
 	return ambient + Lights.L * (diffuse + specular);
 }
 
-void main()
+vec4 Object(int i)
 {
 	vec4 FinalResultLights = vec4(LightsModel(Position, normalize(Normal)), 1);
 	vec4 FinalResultSpot = vec4(BlinnPhongSpot(Position, normalize(Normal)), 1);
-	vec4 TexMeth = vec4(TextureMeth(Position, normalize(Normal)), 1);
+	vec4 TexMeth = vec4(TextureMeth(Position, normalize(Normal), i), 1);
     FragColor = FinalResultLights + FinalResultSpot + TexMeth;
-	//FragColor = FinalResultLights + FinalResultSpot;
-	//FragColor = TexMeth;
+
+	return FragColor;
+}
+
+vec4 Other()
+{
+	vec4 FinalResultLights = vec4(LightsModel(Position, normalize(Normal)), 1);
+	vec4 FinalResultSpot = vec4(BlinnPhongSpot(Position, normalize(Normal)), 1);
+    FragColor = FinalResultLights + FinalResultSpot;
+
+	return FragColor;
+}
+
+void main()
+{
+	if( Pass == 0 ) FragColor = Other();
+    if( Pass == 1 ) FragColor = Object(1);
+	if( Pass == 2 ) FragColor = Object(2);
 }

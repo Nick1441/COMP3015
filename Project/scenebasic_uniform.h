@@ -35,7 +35,8 @@ private:
 
     Plane plane;
     unique_ptr<ObjMesh> mesh;
-
+    unique_ptr<ObjMesh> StreetLamp1;
+    Teapot teapot;
     void setMatrices();
 
     void compile();
@@ -47,6 +48,9 @@ public:
     void update(float t);
     void render();
     void resize(int, int);
+    void RenderObject();
+    void RenderObject2();
+    void RenderOther();
 };
 
 #endif // SCENEBASIC_UNIFORM_H
