@@ -9,11 +9,12 @@ using std::endl;
 
 using glm::vec3;
 using glm::mat4;
+using glm::vec4;
+using glm::mat3;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : plane(10.0f, 10.0f, 100, 100)
+SceneBasic_Uniform::SceneBasic_Uniform() : plane(50.0f, 50.0f, 1, 1)
 {
-    //mesh = ObjMesh::load("../Project/media/pig_triangulated.obj", true);
-    BackGround = ObjMesh::load("../Project/media/BackGround.obj", true);
+    mesh = ObjMesh::load("../Project/media/Truck.obj", true);
 }
 
 void SceneBasic_Uniform::initScene()
@@ -21,9 +22,23 @@ void SceneBasic_Uniform::initScene()
     compile();
     glEnable(GL_DEPTH_TEST);
 
-    view = glm::lookAt(vec3(0.5f, 0.75f, 0.75f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-    projection = mat4(1.0f);
+    view = glm::lookAt(vec3(2.0f, 2.0f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
+        1.0f, 0.0f));
+    
 
+
+    //LIGHT SETTINGS
+
+    //Indiveidual lights.
+    projection = mat4(1.0f);
+    Shader_BlinnPhong.setUniform("Spot.L", vec3(0.0f, 0.9f, 0.0f));
+    Shader_BlinnPhong.setUniform("Spot.La", vec3(0.9f));
+    Shader_BlinnPhong.setUniform("Spot.Exponent", 100.0f); //Blurry Around Circle
+    Shader_BlinnPhong.setUniform("Spot.CutOff", glm::radians(15.0f));  //Size of circle
+
+
+    //Spotlight lights.
+    projection = mat4(1.0f);
     float x, z;
     std::stringstream name;
     name << "Lights.Position";
@@ -34,7 +49,11 @@ void SceneBasic_Uniform::initScene()
 
     Shader_BlinnPhong.setUniform("Lights.L", vec3(1.0f, 0.0f, 0.0f));
 
-    Shader_BlinnPhong.setUniform("Light.La", 0.8f, 0.8f, 0.8f);
+    Shader_BlinnPhong.setUniform("Lights.La", 0.8f, 0.8f, 0.8f);
+
+    GLuint texID = Texture::loadTexture("../Project/media/texture/Truck.png");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texID);
 }
 
 void SceneBasic_Uniform::compile()
@@ -51,31 +70,6 @@ void SceneBasic_Uniform::compile()
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
     }
-
-    ////Toons Shader
-    //try {
-    //    Shader_Toon.compileShader("shader/basic_uniform.vert");
-    //    Shader_Toon.compileShader("shader/basic_uniform.frag");
-    //    Shader_Toon.link();
-    //}
-    //catch (GLSLProgramException& e)
-    //{
-    //    cerr << e.what() << endl;
-    //    exit(EXIT_FAILURE);
-    //}
-
-    ////Texture Shader
-    //try {
-    //    Shader_Texture.compileShader("shader/basic_uniform.vert");
-    //    Shader_Texture.compileShader("shader/basic_uniform.frag");
-    //    Shader_Texture.link();
-    //}
-    //catch (GLSLProgramException& e)
-    //{
-    //    cerr << e.what() << endl;
-    //    exit(EXIT_FAILURE);
-    //}
-
 }
 
 void SceneBasic_Uniform::update(float t)
@@ -87,19 +81,39 @@ void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    //Directional Light for Moon, Light Shading Etc....
+    //Point Light, Car Light heading Outwards.
+    //SpotLight, Lamp Post, Will Fade in/out....
+    //Skybox, jungle type thing...
+    //Some sort of moving light somehow?
+
+
+
+
+    //Spot Light Settings
+    vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);
+    Shader_BlinnPhong.setUniform("Spot.Position", vec3(view * lightPos));
+    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+    Shader_BlinnPhong.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+
+    //MESH RENDERING
     Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
     Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
-    Shader_BlinnPhong.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
+    Shader_BlinnPhong.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
     Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
 
     model = mat4(1.0f);
-    model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, vec3(0.0f, 0.5f, -0.5f));
+    model = glm::scale(model, vec3(0.02f, 0.02f, 0.02f));
+    //model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
+    //model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
-    BackGround->render();
+    mesh->render();
 
-    Shader_BlinnPhong.setUniform("Material.Kd", 0.1f, 0.1f, 0.1f);
+    ////PLANE SETTINGS
+    Shader_BlinnPhong.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
     Shader_BlinnPhong.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
-    Shader_BlinnPhong.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
+    Shader_BlinnPhong.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
     Shader_BlinnPhong.setUniform("Material.Shininess", 180.0f);
     model = mat4(1.0f);
 

@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Additional Files\cube.cpp" />
     <ClCompile Include="Additional Files\objmesh.cpp" />
     <ClCompile Include="Additional Files\plane.cpp" />
     <ClCompile Include="Additional Files\teapot.cpp" />
@@ -153,11 +154,14 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
+    <ClCompile Include="helper\stb\stb_image.cpp" />
+    <ClCompile Include="helper\texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Additional Files\aabb.h" />
+    <ClInclude Include="Additional Files\cube.h" />
     <ClInclude Include="Additional Files\drawable.h" />
     <ClInclude Include="Additional Files\glutils.h" />
     <ClInclude Include="Additional Files\objmesh.h" />
@@ -173,6 +177,7 @@
     <ClInclude Include="helper\scenerunner.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
+    <ClInclude Include="helper\texture.h" />
     <ClInclude Include="scenebasic_uniform.h" />
   </ItemGroup>
   <ItemGroup>
