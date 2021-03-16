@@ -28,6 +28,21 @@
     <Filter Include="helper\stb">
       <UniqueIdentifier>{4cdcf606-56e5-49a6-9e23-5c61a5a98c8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\Scenario3">
+      <UniqueIdentifier>{b2ab3def-c72a-4535-880e-73c0d26f9e37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Scenario1">
+      <UniqueIdentifier>{7164138e-f139-4cd1-a6a6-2459a5895b33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Scenario2">
+      <UniqueIdentifier>{6c1c4d08-1541-4ce6-827c-63322bcbe18e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Scenario4">
+      <UniqueIdentifier>{bb95eca7-3f58-4dba-93b5-b2e747508d2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\Skybox">
+      <UniqueIdentifier>{07b3eac6-79e5-4901-b10b-88b0545aa723}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="helper\stb\stb_image.cpp">
       <Filter>helper\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\skybox.cpp">
+      <Filter>helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +146,9 @@
     <ClInclude Include="helper\stb\stb_image_write.h">
       <Filter>helper\stb</Filter>
     </ClInclude>
+    <ClInclude Include="helper\skybox.h">
+      <Filter>helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\Shader_BlinnPhong.frag">
@@ -142,11 +163,35 @@
     <None Include="shader\Shader_Texture.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\Shader_Toons.frag">
-      <Filter>shaders</Filter>
+    <None Include="shader\Scenario3.frag">
+      <Filter>shaders\Scenario3</Filter>
     </None>
-    <None Include="shader\Shader_Toons.vert">
-      <Filter>shaders</Filter>
+    <None Include="shader\Scenario3.vert">
+      <Filter>shaders\Scenario3</Filter>
+    </None>
+    <None Include="shader\Scenario1.frag">
+      <Filter>shaders\Scenario1</Filter>
+    </None>
+    <None Include="shader\Scenario1.vert">
+      <Filter>shaders\Scenario1</Filter>
+    </None>
+    <None Include="shader\Scenario2.frag">
+      <Filter>shaders\Scenario2</Filter>
+    </None>
+    <None Include="shader\Scenario2.vert">
+      <Filter>shaders\Scenario2</Filter>
+    </None>
+    <None Include="shader\Scenario4.frag">
+      <Filter>shaders\Scenario4</Filter>
+    </None>
+    <None Include="shader\Scenario4.vert">
+      <Filter>shaders\Scenario4</Filter>
+    </None>
+    <None Include="shader\SkyBox.frag">
+      <Filter>shaders\Skybox</Filter>
+    </None>
+    <None Include="shader\SkyBox.vert">
+      <Filter>shaders\Skybox</Filter>
     </None>
   </ItemGroup>
 </Project>

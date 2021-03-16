@@ -154,6 +154,7 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
+    <ClCompile Include="helper\skybox.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
     <ClCompile Include="helper\texture.cpp" />
     <ClCompile Include="main.cpp" />
@@ -175,18 +176,27 @@
     <ClInclude Include="helper\glutils.h" />
     <ClInclude Include="helper\scene.h" />
     <ClInclude Include="helper\scenerunner.h" />
+    <ClInclude Include="helper\skybox.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
     <ClInclude Include="helper\texture.h" />
     <ClInclude Include="scenebasic_uniform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shader\Scenario1.frag" />
+    <None Include="shader\Scenario1.vert" />
+    <None Include="shader\Scenario2.frag" />
+    <None Include="shader\Scenario2.vert" />
+    <None Include="shader\Scenario3.frag" />
+    <None Include="shader\Scenario3.vert" />
+    <None Include="shader\Scenario4.frag" />
+    <None Include="shader\Scenario4.vert" />
     <None Include="shader\Shader_BlinnPhong.frag" />
     <None Include="shader\Shader_BlinnPhong.vert" />
     <None Include="shader\Shader_Texture.frag" />
     <None Include="shader\Shader_Texture.vert" />
-    <None Include="shader\Shader_Toons.frag" />
-    <None Include="shader\Shader_Toons.vert" />
+    <None Include="shader\SkyBox.frag" />
+    <None Include="shader\SkyBox.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

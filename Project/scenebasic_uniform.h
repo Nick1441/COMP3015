@@ -10,6 +10,7 @@
 #include "helper/texture.h"
 #include "helper/stb/stb_image.h"
 #include "helper/glutils.h"
+#include "helper/skybox.h"
 
 //Additional Files
 #include "Additional Files/drawable.h"
@@ -31,13 +32,32 @@ using namespace std;
 class SceneBasic_Uniform : public Scene
 {
 private:
-    GLSLProgram Shader_BlinnPhong;
+    //GLSLProgram Shader_BlinnPhong;
 
+    GLSLProgram Shader_1;
+    GLSLProgram Shader_2;
+    GLSLProgram Shader_3;
+    GLSLProgram Shader_4;
+
+    SkyBox sky;
+    GLSLProgram SkyBox;
+
+    float angle;
+    float angle2;
+    float angle3;
+    float tPrev;
+    float tPrev2;
+    float rotSpeed;
     Plane plane;
-    unique_ptr<ObjMesh> mesh;
-    unique_ptr<ObjMesh> StreetLamp1;
-    Teapot teapot;
+    unique_ptr<ObjMesh> CarModel;
+    unique_ptr<ObjMesh> CarModelNormal;
+    //unique_ptr<ObjMesh> StreetLamp1;
+    //Teapot teapot;
     void setMatrices();
+    void setMatrices2();
+    void setMatrices3();
+    void setMatrices4();
+    void setMatricesSky();
 
     void compile();
 
@@ -48,9 +68,15 @@ public:
     void update(float t);
     void render();
     void resize(int, int);
-    void RenderObject();
-    void RenderObject2();
-    void RenderOther();
+    void InputPressed(int);
+    void RenderSkyBox();
+
+    void Scenario_1();
+    void Scenario_2();
+    void Scenario_3();
+    void Scenario_4();
+    void Scenario_5();
+    void Scenario_6();
 };
 
 #endif // SCENEBASIC_UNIFORM_H

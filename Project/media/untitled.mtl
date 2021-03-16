@@ -1,0 +1,83 @@
+# Blender MTL File: 'None'
+# Material Count: 7
+
+newmtl Brake_Caliper
+Ns 225.000000
+Ka 0.850000 0.850000 0.850000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump -bm 0.140017 E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteBrakes\\BRAKE_CALIPER_NORMAL.png
+map_Kd E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteBrakes\\BRAKE_CALIPER_DIFFUSE.png
+map_Ns E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteBrakes\\BRAKE_CALIPER_ROUGHNESS.png
+
+newmtl Brake_Disc
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 3
+map_Bump -bm 0.070008 E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteBrakes\\BrakeDisc\\BRAKE_DISC_NORMAL.png
+map_Kd E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteBrakes\\BrakeDisc\\BRAKE_DISC_DIFFUSE.png
+map_Ns E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteBrakes\\BrakeDisc\\BRAKE_DISC_ROUGHNESS.png
+
+newmtl Car_Paint
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.041536 0.000000 0.008865
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 3
+
+newmtl CorvetteWingEmblem
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWingEmblem\\512x512\\CorvetteWingEmblemColor.png
+map_Ns E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWingEmblem\\512x512\\CorvetteWingEmblemRoughness.png
+refl E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWingEmblem\\512x512\\CorvetteWingEmblemMetallic2.png
+
+newmtl LicensePlate_Frame
+Ns 625.000015
+Ka 1.000000 1.000000 1.000000
+Kd 0.009018 0.009018 0.009018
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Rim
+Ns 576.000017
+Ka 1.000000 1.000000 1.000000
+Kd 0.028463 0.028463 0.028463
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 3
+
+newmtl TireMaterial
+Ns 208.933899
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteTires\\MICHELIN_TIRE_DIFFUSE.png
+map_Ns E:\\Users\\Nick\\Downloads\\chevrolet-corvette-c7\\source\\CorvetteMaterials\\CorvetteWheels\\CorvetteTires\\MICHELIN_TIRE_ROUGNESS.png
