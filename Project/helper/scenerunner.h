@@ -134,6 +134,7 @@ private:
             int Key5 = glfwGetKey(window, GLFW_KEY_5);
             int Key6 = glfwGetKey(window, GLFW_KEY_ENTER);
             int Key7 = glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT);
+            int Key8 = glfwGetKey(window, GLFW_KEY_ESCAPE);
 
             if (state == GLFW_PRESS)
             {
@@ -166,6 +167,10 @@ private:
             else if (Key7 == GLFW_PRESS)
             {
                 scene.InputPressed(11);
+            }
+            else if (Key8 == GLFW_PRESS)
+            {
+                glfwSetWindowShouldClose(window, true);
             }
             
         }

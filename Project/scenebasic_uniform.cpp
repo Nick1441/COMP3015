@@ -369,10 +369,10 @@ void  SceneBasic_Uniform::Scenario_1()
     Shader_1.setUniform("Light.La", vec3(0.1f, 0.1f, 0.1f));
     Shader_1.setUniform("Light.L", vec3(1.0f, 1.0f, 1.0f));
 
-    Shader_1.setUniform("Material.Ks", 0.5f, 0.5f, 0.5f);
+    Shader_1.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
     Shader_1.setUniform("Material.Kd", 0.5f, 0.5f, 0.5f);
     Shader_1.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
-    Shader_1.setUniform("Material.Shininess", 180.0f);
+    Shader_1.setUniform("Material.Shininess", 300.0f);
 
     Shader_1.setUniform("Pass", 1);
 
@@ -620,17 +620,6 @@ void  SceneBasic_Uniform::Scenario_5()
     model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
     setMatrices5();
     CarModel->render();
-}
-
-void  SceneBasic_Uniform::Scenario_6()
-{
-    //
-    // This is Car 1, This will Display
-    // - Toon Shading
-    // - Spolight, Changes Colour
-    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
-        1.0f, 0.0f));
-
 }
 
 void SceneBasic_Uniform::RenderSkyBox()
