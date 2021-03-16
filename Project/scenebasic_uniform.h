@@ -34,29 +34,37 @@ class SceneBasic_Uniform : public Scene
 private:
     //GLSLProgram Shader_BlinnPhong;
 
+    //Creating Each Shader Program.
     GLSLProgram Shader_1;
     GLSLProgram Shader_2;
     GLSLProgram Shader_3;
     GLSLProgram Shader_4;
+    GLSLProgram Shader_5;
+    GLSLProgram Text;
 
     SkyBox sky;
     GLSLProgram SkyBox;
 
     float angle;
     float angle2;
-    float angle3;
+    float angle3, angle5;
     float tPrev;
     float tPrev2;
     float rotSpeed;
+    float Value, Value2, Value3;
     Plane plane;
     unique_ptr<ObjMesh> CarModel;
     unique_ptr<ObjMesh> CarModelNormal;
     //unique_ptr<ObjMesh> StreetLamp1;
     //Teapot teapot;
+
+    //Set Matricies For Each Shader.
     void setMatrices();
     void setMatrices2();
     void setMatrices3();
     void setMatrices4();
+    void setMatrices5();
+
     void setMatricesSky();
 
     void compile();
@@ -70,7 +78,7 @@ public:
     void resize(int, int);
     void InputPressed(int);
     void RenderSkyBox();
-
+    void TextToScreen();
     void Scenario_1();
     void Scenario_2();
     void Scenario_3();

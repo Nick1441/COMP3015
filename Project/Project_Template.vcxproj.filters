@@ -43,6 +43,9 @@
     <Filter Include="shaders\Skybox">
       <UniqueIdentifier>{07b3eac6-79e5-4901-b10b-88b0545aa723}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shaders\Scenario5">
+      <UniqueIdentifier>{94927318-f40e-4893-80ad-8fbade7396cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -192,6 +195,12 @@
     </None>
     <None Include="shader\SkyBox.vert">
       <Filter>shaders\Skybox</Filter>
+    </None>
+    <None Include="shader\Scenario5.frag">
+      <Filter>shaders\Scenario5</Filter>
+    </None>
+    <None Include="shader\Scenario5.vert">
+      <Filter>shaders\Scenario5</Filter>
     </None>
   </ItemGroup>
 </Project>

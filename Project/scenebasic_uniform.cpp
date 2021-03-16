@@ -14,6 +14,7 @@ using glm::mat3;
 
 int OverallLoad = 1;
 bool Scene1Toggle = true;
+bool Scene4Toggle = false;
 
 SceneBasic_Uniform::SceneBasic_Uniform() : plane(10.0f, 10.0f, 100, 100), angle3(0.0f), angle(0.0f), tPrev(0.0f),
 rotSpeed(glm::pi<float>() / 8.0f),
@@ -137,6 +138,18 @@ void SceneBasic_Uniform::compile()
         exit(EXIT_FAILURE);
     }
 
+    //Scenario 5 Shader
+    try {
+        Shader_5.compileShader("shader/Scenario5.vert");
+        Shader_5.compileShader("shader/Scenario5.frag");
+        Shader_5.link();
+    }
+    catch (GLSLProgramException& e)
+    {
+        cerr << e.what() << endl;
+        exit(EXIT_FAILURE);
+    }
+
     //SkyBox Shader
     try {
         SkyBox.compileShader("shader/SkyBox.vert");
@@ -148,16 +161,33 @@ void SceneBasic_Uniform::compile()
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
     }
+
+    //Text Shader
+    try {
+        Text.compileShader("shader/TextShader.vert");
+        Text.compileShader("shader/TextShader.frag");
+        Text.link();
+    }
+    catch (GLSLProgramException& e)
+    {
+        cerr << e.what() << endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 void SceneBasic_Uniform::update(float t)
 {
     if (m_animate) {
-        angle += 0.1f;
+        angle += 0.05f;
         if (angle >= 360.0f)
             angle -= 360.0f;
     }
 
+    if (m_animate) {
+        angle5 += 0.015f;
+        if (angle5 >= 360.0f)
+            angle5 -= 360.0f;
+    }
 
     //USED FOR SKYBOX ROTATION
     float deltaT2 = t - tPrev;
@@ -174,6 +204,13 @@ void SceneBasic_Uniform::update(float t)
         angle3 -= glm::two_pi<float>();
     }
 
+
+    //
+    //COLOUR CHANGE
+        float timeValue = t;
+    Value = sin(timeValue) / 4.0f + 0.5f;
+    Value2 = sin(timeValue) / 4.0f + 0.25f;
+    Value3 = sin(timeValue) / 4.0f + 0.75f;
 }
 
 void SceneBasic_Uniform::render()
@@ -245,6 +282,15 @@ void SceneBasic_Uniform::setMatrices4()
     Shader_4.setUniform("MVP", projection * mv);
 }
 
+void SceneBasic_Uniform::setMatrices5()
+{
+    mat4 mv = view * model;
+
+    Shader_5.setUniform("ModelViewMatrix", mv);
+    Shader_5.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    Shader_5.setUniform("MVP", projection * mv);
+}
+
 void SceneBasic_Uniform::setMatricesSky()
 {
     mat4 mv = view * model;
@@ -276,9 +322,18 @@ void  SceneBasic_Uniform::InputPressed(int num)
     {
         Scene1Toggle = false;
     }
+    else if (OverallLoad == 4 && num == 10)
+    {
+        Scene4Toggle = false;
+    }
+
     if (OverallLoad == 1 && num == 11)
     {
         Scene1Toggle = true;
+    }
+    else if (OverallLoad == 4 && num == 11)
+    {
+        Scene4Toggle = true;
     }
 }
 
@@ -318,10 +373,6 @@ void  SceneBasic_Uniform::Scenario_1()
     Shader_1.setUniform("Material.Kd", 0.5f, 0.5f, 0.5f);
     Shader_1.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
     Shader_1.setUniform("Material.Shininess", 180.0f);
-
-    Shader_1.setUniform("Fog.MaxDist", 30.0f);
-    Shader_1.setUniform("Fog.MinDist", 10.0f);
-    Shader_1.setUniform("Fog.Color", vec3(0.8f, 0.8f, 0.8f));
 
     Shader_1.setUniform("Pass", 1);
 
@@ -472,7 +523,16 @@ void  SceneBasic_Uniform::Scenario_4()
     // 
     // - Toon Shading
     // - Moving Lights
-    //
+    // - Fog (Issues With this)
+
+    if (Scene4Toggle)
+    {
+        Shader_4.setUniform("Pass", 1);
+    }
+    else
+    {
+        Shader_4.setUniform("Pass", 0);
+    }
 
     view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
         1.0f, 0.0f));
@@ -480,11 +540,11 @@ void  SceneBasic_Uniform::Scenario_4()
     //Setting Shader To Use
     Shader_4.use();
 
-    vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);
+    vec4 lightPos = vec4(10.0f * cos(angle5), 10.0f, 10.0f * sin(angle5), 1.0f);
     Shader_4.setUniform("Light.Position", view * lightPos);
 
     //Setting Lights Colour
-    Shader_4.setUniform("Light.L", vec3(0.06f, 0.34f, 0.81f));
+    Shader_4.setUniform("Light.L", vec3(Value3, Value2, Value));
     Shader_4.setUniform("Light.La", vec3(0.2f, 0.2f, 0.2f));
 
     Shader_4.setUniform("Material.Kd", 0.2f, 0.55f, 0.9f);
@@ -492,6 +552,10 @@ void  SceneBasic_Uniform::Scenario_4()
     Shader_4.setUniform("Material.Ka", 0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f);
     Shader_4.setUniform("Material.Shininess", 100.0f);
     Shader_4.setUniform("Material.Shininess", 100.0f);
+
+    Shader_4.setUniform("Fog.MaxDist", 50.0f);
+    Shader_4.setUniform("Fog.MinDist", 1.0f);
+    Shader_4.setUniform("Fog.Color", vec3(0.8f, 0.8f, 0.8f));
 
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
@@ -514,6 +578,48 @@ void  SceneBasic_Uniform::Scenario_5()
     view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
         1.0f, 0.0f));
 
+    //Setting Shader To Use
+    Shader_5.use();
+
+    //Setting Lights Positions
+    vec4 lightPos = vec4(10.0f * cos(angle), 20.0f, 10.0f * sin(angle), 6.0f);
+    Shader_5.setUniform("Light.Position", view * lightPos);
+    Shader_5.setUniform("Light.La", vec3(0.1f, 0.1f, 0.1f));
+    Shader_5.setUniform("Light.L", vec3(0.2f, 0.2f, 0.2f));
+
+    //Setting Material Values for Car/Plane
+    Shader_5.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
+    Shader_5.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
+    Shader_5.setUniform("Material.Kd", 0.2f, 0.2f, 0.2f);
+    Shader_5.setUniform("Material.Shininess", 180.0f);
+
+    lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);
+    Shader_5.setUniform("Spot.Position", vec3(view * lightPos));
+    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+    Shader_5.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+
+    Shader_5.setUniform("Spot.L", vec3(Value3, Value2, Value));
+    Shader_5.setUniform("Spot.La", vec3(0.2f));
+    Shader_5.setUniform("Spot.Exponent", 10.0f); //Blurry Around Circle
+    Shader_5.setUniform("Spot.CutOff", glm::radians(5.0f));  //Size of circle
+
+    Shader_5.setUniform("Pass", 0);
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
+    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices5();
+    plane.render();
+
+    //Set Pass to Include Alpha Discarding
+    Shader_5.setUniform("Pass", 1);
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
+    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
+    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices5();
+    CarModel->render();
 }
 
 void  SceneBasic_Uniform::Scenario_6()

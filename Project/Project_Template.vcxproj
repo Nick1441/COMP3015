@@ -191,6 +191,8 @@
     <None Include="shader\Scenario3.vert" />
     <None Include="shader\Scenario4.frag" />
     <None Include="shader\Scenario4.vert" />
+    <None Include="shader\Scenario5.frag" />
+    <None Include="shader\Scenario5.vert" />
     <None Include="shader\Shader_BlinnPhong.frag" />
     <None Include="shader\Shader_BlinnPhong.vert" />
     <None Include="shader\Shader_Texture.frag" />
