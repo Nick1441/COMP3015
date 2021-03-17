@@ -4,12 +4,15 @@ in vec3 Position;
 in vec3 Normal;
 in vec2 TexCoord;
 
+//Setting Locations of Diffuse and Moss Images.
 layout (location = 0) out vec4 FragColor;
 layout (binding = 3) uniform sampler2D ObjTex1;
 layout (binding = 1) uniform sampler2D ObjTex2;
 
+//Setting to ignre sections.
 uniform int Pass;
 
+//Set up light struct
 uniform struct LightInfo 
 {
   vec4 Position;
@@ -17,14 +20,16 @@ uniform struct LightInfo
   vec3 L;
 } Light;
 
+//Set up material Info
 uniform struct MaterialInfo 
 {
-  vec3 Ka;  //Ambient Reflectivity
-  vec3 Kd;  //Diffuse Reflectivity
-  vec3 Ks;  //Specular Reflectivity
-  float Shininess;   //Specular Shininess Factor
+  vec3 Ka;
+  vec3 Kd;
+  vec3 Ks;
+  float Shininess;
 } Material;
 
+//Setting Spotlight Struct
 uniform struct SpotLightInfo 
 {
   vec3 Position;
@@ -35,8 +40,8 @@ uniform struct SpotLightInfo
   float CutOff;
 } Spot;
 
-//Light One, Need to check which light ngl..
-vec3 LightsModel(vec3 position, vec3 normal)
+//Light One
+vec3 LightModel(vec3 position, vec3 normal)
 {
 	//Ambient
 	vec3 ambient = Material.Ka * Light.La;
@@ -60,7 +65,7 @@ vec3 LightsModel(vec3 position, vec3 normal)
 }
 
 //SpotLight!
-vec3 BlinnPhongSpot(vec3 position, vec3 normal)
+vec3 SpotLightModel(vec3 position, vec3 normal)
 {
 	//Ambient
 	vec3 ambient = Material.Ka * Spot.La;
@@ -69,13 +74,13 @@ vec3 BlinnPhongSpot(vec3 position, vec3 normal)
 	vec3 s = normalize(vec3(Spot.Position.xyz - position));
 
 	float cosAng = dot(-s, normalize(Spot.Direction));
-	float angle = acos(cosAng);
+	float angle_1 = acos(cosAng);
 	float spotScale = 0.0;
 
 	vec3 diffuse = vec3(0.0f);
 	vec3 specular = vec3(0.0f);
 
-	if (angle < Spot.CutOff)
+	if (angle_1 < Spot.CutOff)
 	{
 		spotScale = pow(cosAng, Spot.Exponent);
 
@@ -96,10 +101,9 @@ vec3 BlinnPhongSpot(vec3 position, vec3 normal)
 	return ambient + spotScale * Spot.L * (diffuse + specular);
 }
 
-vec3 TextureMeth(vec3 position, vec3 normal, int i)
+vec3 TextureModel(vec3 position, vec3 normal, int i)
 {
-
-	//Texture Setting
+	//Texture Setting, Sets differnt texture depending on "pass".
 	vec3 texColor = vec3(0.0f);
 
 	if (i == 1)
@@ -110,8 +114,6 @@ vec3 TextureMeth(vec3 position, vec3 normal, int i)
 	{
 		texColor = texture(ObjTex2, TexCoord).rgb;
 	}
-
-	//vec3 texColor = texture(ObjTex1, TexCoord).rgb;
 
 	//Ambient
 	vec3 ambient = Light.La * texColor;
@@ -135,10 +137,11 @@ vec3 TextureMeth(vec3 position, vec3 normal, int i)
 }
 
 vec4 Object(int i)
-{
-	vec4 FinalResultLights = vec4(LightsModel(Position, normalize(Normal)), 1);
-	vec4 FinalResultSpot = vec4(BlinnPhongSpot(Position, normalize(Normal)), 1);
-	vec4 TexMeth = vec4(TextureMeth(Position, normalize(Normal), i), 1);
+{	
+	//Gets Spot, Light & Texture, combines and outputs.
+	vec4 FinalResultLights = vec4(LightModel(Position, normalize(Normal)), 1);
+	vec4 FinalResultSpot = vec4(SpotLightModel(Position, normalize(Normal)), 1);
+	vec4 TexMeth = vec4(TextureModel(Position, normalize(Normal), i), 1);
     FragColor = FinalResultLights + FinalResultSpot + TexMeth;
 
 	return FragColor;
@@ -146,8 +149,9 @@ vec4 Object(int i)
 
 vec4 Other()
 {
-	vec4 FinalResultLights = vec4(LightsModel(Position, normalize(Normal)), 1);
-	vec4 FinalResultSpot = vec4(BlinnPhongSpot(Position, normalize(Normal)), 1);
+	//Find Spot & Light, Outputs it. Ignores any Textures.
+	vec4 FinalResultLights = vec4(LightModel(Position, normalize(Normal)), 1);
+	vec4 FinalResultSpot = vec4(SpotLightModel(Position, normalize(Normal)), 1);
     FragColor = FinalResultLights + FinalResultSpot;
 
 	return FragColor;
@@ -155,6 +159,7 @@ vec4 Other()
 
 void main()
 {
+	//Sets where to go depending on Pass, Changes Texture in  Each Method.
 	if( Pass == 0 ) FragColor = Other();
     if( Pass == 1 ) FragColor = Object(1);
 	if( Pass == 2 ) FragColor = Object(2);

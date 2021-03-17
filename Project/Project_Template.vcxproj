@@ -145,11 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Additional Files\cube.cpp" />
     <ClCompile Include="Additional Files\objmesh.cpp" />
     <ClCompile Include="Additional Files\plane.cpp" />
-    <ClCompile Include="Additional Files\teapot.cpp" />
-    <ClCompile Include="Additional Files\torus.cpp" />
     <ClCompile Include="Additional Files\trianglemesh.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="helper\glslprogram.cpp" />
@@ -162,14 +159,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Additional Files\aabb.h" />
-    <ClInclude Include="Additional Files\cube.h" />
     <ClInclude Include="Additional Files\drawable.h" />
     <ClInclude Include="Additional Files\glutils.h" />
     <ClInclude Include="Additional Files\objmesh.h" />
     <ClInclude Include="Additional Files\plane.h" />
-    <ClInclude Include="Additional Files\teapot.h" />
-    <ClInclude Include="Additional Files\teapotdata.h" />
-    <ClInclude Include="Additional Files\torus.h" />
     <ClInclude Include="Additional Files\trianglemesh.h" />
     <ClInclude Include="Additional Files\utils.h" />
     <ClInclude Include="helper\glslprogram.h" />
@@ -193,10 +186,6 @@
     <None Include="shader\Scenario4.vert" />
     <None Include="shader\Scenario5.frag" />
     <None Include="shader\Scenario5.vert" />
-    <None Include="shader\Shader_BlinnPhong.frag" />
-    <None Include="shader\Shader_BlinnPhong.vert" />
-    <None Include="shader\Shader_Texture.frag" />
-    <None Include="shader\Shader_Texture.vert" />
     <None Include="shader\SkyBox.frag" />
     <None Include="shader\SkyBox.vert" />
   </ItemGroup>

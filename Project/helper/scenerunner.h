@@ -136,6 +136,7 @@ private:
             int Key7 = glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT);
             int Key8 = glfwGetKey(window, GLFW_KEY_ESCAPE);
 
+            //USER INPUT KEYS
             if (state == GLFW_PRESS)
             {
                 scene.animate(!scene.animating());

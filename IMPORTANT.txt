@@ -1,0 +1,9 @@
+IMPORTANT
+
+This project Contains Multiple "Scenes" using diffent shaders and Lighing.
+Use 1-6 On Keyboard to change Between them.
+Scene 1 & 4 have a toggle for view/fog.
+ - ENTER = Toggle On.
+ - LShift = Toggle Off.
+
+Scene 1 Does not have Multiple Lights, As issue with sometimes showing white on differnt Computers. Code for multiple is still included.

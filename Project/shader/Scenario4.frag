@@ -5,8 +5,10 @@ in vec3 Normal;
 
 layout (location = 0) out vec4 FragColor;
 
+//Setting to ignre sections.
 uniform int Pass;
 
+//Set up light struct
 uniform struct LightInfo 
 {
   vec4 Position;
@@ -14,6 +16,7 @@ uniform struct LightInfo
   vec3 L;
 } Light;
 
+//Set up material Info
 uniform struct MaterialInfo 
 {
   vec3 Ka;  //Ambient Reflectivity
@@ -22,6 +25,7 @@ uniform struct MaterialInfo
   float Shininess;   //Specular Shininess Factor
 } Material;
 
+//Set up Fog Info
 uniform struct FogInfo
 {
 	float MaxDist;
@@ -29,10 +33,11 @@ uniform struct FogInfo
 	vec3 Color;
 }Fog;
 
+//Setting levels For Fo
 const int levels = 4;
 const float scaleFactor = 1.0 / levels;
 
-vec3 BlinnPhongModel(vec3 position, vec3 normal)
+vec3 FogModel(vec3 position, vec3 normal)
 {
 	//Ambient
 	float ambientStrength = 0.2f;
@@ -53,18 +58,20 @@ void main()
 {
 	if (Pass == 0)
 	{
-		FragColor = vec4(BlinnPhongModel(Position, normalize(Normal)), 1);
+		FragColor = vec4(FogModel(Position, normalize(Normal)), 1);
 	}
 	if (Pass == 1)
 	{
+		//Getting Fog Factor using Distance and Min/Max
 		float dist = abs(Position.z);
-
 		float fogFactor = (Fog.MaxDist - dist)/(Fog.MaxDist - Fog.MinDist);
 
+		//Clamping Fog Factor.
 		fogFactor = clamp(fogFactor, 0.0, 1.0);
 
-		vec3 shadeColour = BlinnPhongModel(Position, normalize(Normal));
+		vec3 shadeColour = FogModel(Position, normalize(Normal));
 
+		//Mixing Colour then setting as Fragcolour.
 		vec3 colour = mix(Fog.Color, shadeColour, fogFactor);
 
 		FragColor = vec4(colour, 1.0);

@@ -66,19 +66,10 @@
     <ClCompile Include="helper\texture.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="Additional Files\cube.cpp">
-      <Filter>Additional Files</Filter>
-    </ClCompile>
     <ClCompile Include="Additional Files\objmesh.cpp">
       <Filter>Additional Files</Filter>
     </ClCompile>
     <ClCompile Include="Additional Files\plane.cpp">
-      <Filter>Additional Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Additional Files\teapot.cpp">
-      <Filter>Additional Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Additional Files\torus.cpp">
       <Filter>Additional Files</Filter>
     </ClCompile>
     <ClCompile Include="Additional Files\trianglemesh.cpp">
@@ -113,9 +104,6 @@
     <ClInclude Include="Additional Files\aabb.h">
       <Filter>Additional Files</Filter>
     </ClInclude>
-    <ClInclude Include="Additional Files\cube.h">
-      <Filter>Additional Files</Filter>
-    </ClInclude>
     <ClInclude Include="Additional Files\drawable.h">
       <Filter>Additional Files</Filter>
     </ClInclude>
@@ -126,15 +114,6 @@
       <Filter>Additional Files</Filter>
     </ClInclude>
     <ClInclude Include="Additional Files\plane.h">
-      <Filter>Additional Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Additional Files\teapot.h">
-      <Filter>Additional Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Additional Files\teapotdata.h">
-      <Filter>Additional Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Additional Files\torus.h">
       <Filter>Additional Files</Filter>
     </ClInclude>
     <ClInclude Include="Additional Files\trianglemesh.h">
@@ -154,18 +133,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\Shader_BlinnPhong.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\Shader_BlinnPhong.vert">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\Shader_Texture.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\Shader_Texture.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="shader\Scenario3.frag">
       <Filter>shaders\Scenario3</Filter>
     </None>

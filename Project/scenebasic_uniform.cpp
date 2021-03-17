@@ -1,65 +1,39 @@
 #include "scenebasic_uniform.h"
-
+#include <glm/gtc/matrix_transform.hpp>
 #include <sstream>
 #include <iostream>
+
 using std::cerr;
 using std::endl;
-
-#include <glm/gtc/matrix_transform.hpp>
 
 using glm::vec3;
 using glm::mat4;
 using glm::vec4;
 using glm::mat3;
 
+//Used for Switching Scenes/Toggles.
 int OverallLoad = 1;
 bool Scene1Toggle = true;
 bool Scene4Toggle = false;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : plane(10.0f, 10.0f, 100, 100), angle3(0.0f), angle(0.0f), tPrev(0.0f),
-rotSpeed(glm::pi<float>() / 8.0f),
-sky(100.0f)
+
+//Setting Components Used Throughout Project
+SceneBasic_Uniform::SceneBasic_Uniform() : plane(10.0f, 10.0f, 100, 100), angle_2(0.0f), angle_1(0.0f), tPrev(0.0f), rotSpeed(glm::pi<float>() / 8.0f), sky(100.0f)
 {
-    CarModel = ObjMesh::load("../Project/media/SportsCar.obj", true);
-    CarModelNormal = ObjMesh::load("../Project/media/SportsCar.obj", false, true);
+    //Loading In Models, Just Texture & Normal Mapping Models.
+    CarModel = ObjMesh::load("media/SportsCar.obj", true);
+    CarModelNormal = ObjMesh::load("media/SportsCar.obj", false, true);
 }
 
 void SceneBasic_Uniform::initScene()
 {
-    //vec4 lightPos = vec4(5.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);
-    //Shader_4.setUniform("Light.Position", view * lightPos);
-    compile();
+    compile();                                                                              //Compile all shaders.
     glEnable(GL_DEPTH_TEST);
 
-    //view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
-    //    1.0f, 0.0f));
-    
+    projection = mat4(1.0f);                                                                //Default Projection Mat
+    angle_2 = glm::radians(90.0f);                                                          //Defualting Angle to Start Rotation of Camera.
 
-    projection = mat4(1.0f);
-    angle3 = glm::radians(90.0f); //set the initial angle
-    //Shader_3.setUniform("Light[0].Position", vec3(100.0f, 1.0f, 1.0f));
-    ////LIGHT SETTINGS
-
-    ////Spot lights.
-    //projection = mat4(1.0f);
-    //Shader_BlinnPhong.setUniform("Spot.L", vec3(0.0f, 0.0f, 0.9f));
-    //Shader_BlinnPhong.setUniform("Spot.La", vec3(0.2f));
-    //Shader_BlinnPhong.setUniform("Spot.Exponent", 10.0f); //Blurry Around Circle
-    //Shader_BlinnPhong.setUniform("Spot.CutOff", glm::radians(5.0f));  //Size of circle
-    ////Spotlight lights.
-    //projection = mat4(1.0f);
-    //float x, z;
-    //std::stringstream name;
-    //name << "Lights.Position";
-    //x = 2.0f * cosf((glm::two_pi<float>() / 3));
-    //z = 2.0f * sinf((glm::two_pi<float>() / 3));
-    //Shader_BlinnPhong.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z +
-    //    1.0f, 1.0f));
-
-    //Shader_BlinnPhong.setUniform("Lights.L", vec3(1.0f, 1.0f, 1.0f));
-
-    //Shader_BlinnPhong.setUniform("Lights.La", 0.8f, 0.8f, 0.8f);
-
+    //Loading in Textures.
     GLuint ID1 = Texture::loadTexture("media/texture/skylineColor.png");
     GLuint ID2 = Texture::loadTexture("media/texture/skylineNormal.png");
     GLuint ID3 = Texture::loadTexture("media/texture/moss.png");
@@ -68,6 +42,7 @@ void SceneBasic_Uniform::initScene()
 
     GLuint cubeTex = Texture::loadCubeMap("media/texture/cube/Skybox/skybox2");
 
+    //Loading each Texture into Bindings.
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ID1);
 
@@ -86,10 +61,13 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
+    LoadShadersVariables();
 }
 
 void SceneBasic_Uniform::compile()
 {
+    //Links Each shader to each file and sets up for use.
+
     //Scenario 1 Shader
     try {
         Shader_1.compileShader("shader/Scenario1.vert");
@@ -161,35 +139,18 @@ void SceneBasic_Uniform::compile()
         cerr << e.what() << endl;
         exit(EXIT_FAILURE);
     }
-
-    //Text Shader
-    try {
-        Text.compileShader("shader/TextShader.vert");
-        Text.compileShader("shader/TextShader.frag");
-        Text.link();
-    }
-    catch (GLSLProgramException& e)
-    {
-        cerr << e.what() << endl;
-        exit(EXIT_FAILURE);
-    }
 }
 
 void SceneBasic_Uniform::update(float t)
 {
+    //Angle 1 Rotation, for scene 1 Lighting.
     if (m_animate) {
-        angle += 0.05f;
-        if (angle >= 360.0f)
-            angle -= 360.0f;
+        angle_1 += 0.05f;
+        if (angle_1 >= 360.0f)
+            angle_1 -= 360.0f;
     }
 
-    if (m_animate) {
-        angle5 += 0.015f;
-        if (angle5 >= 360.0f)
-            angle5 -= 360.0f;
-    }
-
-    //USED FOR SKYBOX ROTATION
+    //SkyBox Rotation
     float deltaT2 = t - tPrev;
     if (tPrev == 0.0f)
     {
@@ -197,17 +158,22 @@ void SceneBasic_Uniform::update(float t)
     }
 
     tPrev = t;
-    angle3 += rotSpeed * deltaT2;
+    angle_2 += rotSpeed * deltaT2;
 
-    if (angle3 > glm::two_pi<float>())
+    if (angle_2 > glm::two_pi<float>())
     {
-        angle3 -= glm::two_pi<float>();
+        angle_2 -= glm::two_pi<float>();
     }
 
+    //Rotation for Light Moving.
+    if (m_animate) {
+        angle_3 += 0.015f;
+        if (angle_3 >= 360.0f)
+            angle_3 -= 360.0f;
+    }
 
-    //
-    //COLOUR CHANGE
-        float timeValue = t;
+    //Used to change the colour. (Each offset to mix it up)
+    float timeValue = t;
     Value = sin(timeValue) / 4.0f + 0.5f;
     Value2 = sin(timeValue) / 4.0f + 0.25f;
     Value3 = sin(timeValue) / 4.0f + 0.75f;
@@ -215,6 +181,11 @@ void SceneBasic_Uniform::update(float t)
 
 void SceneBasic_Uniform::render()
 {
+    //
+    //Overall Controller for project. Changes scene based on OverallLoad Integer. 
+    //Changes each methods to render & Renders Skybox.
+    //
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     if (OverallLoad == 1)
@@ -242,10 +213,9 @@ void SceneBasic_Uniform::render()
         Scenario_5();
         RenderSkyBox();
     }
-
-
 }
 
+//Setting Matrices for Each Shader. All The same code, just differnt Shaders.
 void SceneBasic_Uniform::setMatrices()
 {
     mat4 mv = view * model;
@@ -300,72 +270,25 @@ void SceneBasic_Uniform::setMatricesSky()
     SkyBox.setUniform("MVP", projection * mv);
 }
 
-void SceneBasic_Uniform::resize(int w, int h)
-{
-    glViewport(0, 0, w, h);
-    width = w;
-    height = h;
-    projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
-}
-
-void  SceneBasic_Uniform::InputPressed(int num)
-{
-    //KEYBOARD CLICKS, WILL RENDER DIFFERNT ITEMS ON DIFFERNT CLICKS
-    if (num < 7)
-    {
-        OverallLoad = num;
-    }
-    
-
-    //Scene 1 Camera Movement Toggle
-    if (OverallLoad == 1 && num == 10)
-    {
-        Scene1Toggle = false;
-    }
-    else if (OverallLoad == 4 && num == 10)
-    {
-        Scene4Toggle = false;
-    }
-
-    if (OverallLoad == 1 && num == 11)
-    {
-        Scene1Toggle = true;
-    }
-    else if (OverallLoad == 4 && num == 11)
-    {
-        Scene4Toggle = true;
-    }
-}
-
-void  SceneBasic_Uniform::Scenario_1()
+void SceneBasic_Uniform::LoadShadersVariables()
 {
     //
-    // - Normals
-    // - BlinnPhong
-    // - Moving Lights.
-    // - Fog
-    //
-
-    vec3 cameraPos = vec3(0.0f);
-    if (Scene1Toggle)
-    {
-        cameraPos = vec3(7.0f * cos(angle3), 2.0f, 7.0f * sin(angle3));
-        view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f,
-            0.0f));
-    }
-    else
-    {
-        cameraPos = vec3(7.0f * cos(90), 2.0f, 7.0f * sin(90));
-        view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f,
-            0.0f));
-    }
-
-    //Setting Shader To Use
+    //SCENE 1 NON-CHANGING VARIABLES
     Shader_1.use();
 
-    //Setting Lights Positions
-    vec4 lightPos = vec4(10.0f * cos(angle), 20.0f, 10.0f * sin(angle), 6.0f);
-    Shader_1.setUniform("Light.Position", view * lightPos);
+    //MULTIPLE LIGHTS CODE
+    //Shader_1.setUniform("Light[0].La", vec3(0.1f, 0.1f, 0.1f));
+    //Shader_1.setUniform("Light[1].La", vec3(0.9f, 0.9f, 0.9f));
+
+    // Shader_1.setUniform("Light[0].L", vec3(1.0f, 1.0f, 1.0f));
+    //Shader_1.setUniform("Light[1].L", vec3(0.0f, 0.0f, 0.0f));
+
+    //Setting Lights Positions (Move Into Scenario1)
+    //vec4 lightPos = vec4(10.0f * cos(angle_1), 20.0f, 10.0f * sin(angle_1), 6.0f);
+    //Shader_1.setUniform("Light[0].Position", view * lightPos);
+    //Shader_1.setUniform("Light[1].Position", vec3(50.0f, 0.0f, 0.0f));
+
+    //Single Light Code
     Shader_1.setUniform("Light.La", vec3(0.1f, 0.1f, 0.1f));
     Shader_1.setUniform("Light.L", vec3(1.0f, 1.0f, 1.0f));
 
@@ -374,57 +297,8 @@ void  SceneBasic_Uniform::Scenario_1()
     Shader_1.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
     Shader_1.setUniform("Material.Shininess", 300.0f);
 
-    Shader_1.setUniform("Pass", 1);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
-    //model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
-    setMatrices();
-    plane.render();
-
-    Shader_1.setUniform("Pass", 0);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(-2.0f, -0.45f, 0.0f));
-    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
-    //model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
-    setMatrices();
-    CarModelNormal->render();
-
-    //Uses differnt pass for differnt Texture!
-    Shader_1.setUniform("Pass", 2);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, -0.45f, 1.0f));
-    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
-    //model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
-    setMatrices();
-    CarModelNormal->render();
-
-    Shader_1.setUniform("Pass", 3);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(2.0f, -0.45f, 2.0f));
-    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
-    //model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
-    setMatrices();
-    CarModelNormal->render();
-
-}
-
-void  SceneBasic_Uniform::Scenario_2()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //
-    // - Alpha Test
-    // - Texture
-    // - Lights
-    //
-
-    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
-        1.0f, 0.0f));
-
-    //Setting Shader To Use
+    //SCENE 2 NON-CHANGING VARIABLES
     Shader_2.use();
 
     //Setting Lights Positions
@@ -438,40 +312,8 @@ void  SceneBasic_Uniform::Scenario_2()
     Shader_2.setUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
     Shader_2.setUniform("Material.Shininess", 180.0f);
 
-    //Sets Pass to Ignore Texture Coords method.
-    Shader_2.setUniform("Pass_2", 0);
 
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
-    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
-    setMatrices2();
-    plane.render();
-
-    //Set Pass to Include Alpha Discarding
-    Shader_2.setUniform("Pass_2", 1);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
-    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
-    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
-    setMatrices2();
-    CarModel->render();
-
-}
-
-void  SceneBasic_Uniform::Scenario_3()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // 
-    // - BlinnPhong
-    // - MultiTexture
-    // - Multiple Lights
-    //
-
-    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
-        1.0f, 0.0f));
-
-    //Setting Shader To Use
+    //SCENE 3 NON-CHANGING VARIABLES
     Shader_3.use();
 
     //Setting Lights Positions
@@ -497,12 +339,188 @@ void  SceneBasic_Uniform::Scenario_3()
     Shader_3.setUniform("Material.Kd", 0.2f, 0.2f, 0.2f);
     Shader_3.setUniform("Material.Shininess", 180.0f);
 
+
+    //SCENE 5 NON-CHANGING VARIABLES
+    Shader_5.use();
+
+    Shader_5.setUniform("Light.La", vec3(0.1f, 0.1f, 0.1f));
+    Shader_5.setUniform("Light.L", vec3(0.2f, 0.2f, 0.2f));
+
+    //Setting Material Values for Car/Plane
+    Shader_5.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
+    Shader_5.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
+    Shader_5.setUniform("Material.Kd", 0.2f, 0.2f, 0.2f);
+    Shader_5.setUniform("Material.Shininess", 180.0f);
+
+    Shader_5.setUniform("Spot.La", vec3(0.2f));
+    Shader_5.setUniform("Spot.Exponent", 10.0f); //Blurry Around Circle
+    Shader_5.setUniform("Spot.CutOff", glm::radians(5.0f));  //Size of circle
+}
+
+void SceneBasic_Uniform::resize(int w, int h)
+{
+    glViewport(0, 0, w, h);
+    width = w;
+    height = h;
+    projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
+}
+
+void  SceneBasic_Uniform::InputPressed(int num)
+{
+    //Checks for input Pressed, If below 7, its changing scenes!
+    if (num < 7)
+    {
+        OverallLoad = num;
+    }
+    
+    //Scene 1 & 4 Camera Movement/Fog Toggle
+    if (OverallLoad == 1 && num == 10)
+    {
+        Scene1Toggle = false;
+    }
+    else if (OverallLoad == 4 && num == 10)
+    {
+        Scene4Toggle = false;
+    }
+
+    if (OverallLoad == 1 && num == 11)
+    {
+        Scene1Toggle = true;
+    }
+    else if (OverallLoad == 4 && num == 11)
+    {
+        Scene4Toggle = true;
+    }
+}
+
+void  SceneBasic_Uniform::Scenario_1()
+{
+    //
+    // - BlinnPhong Shading
+    // - Multiple Models
+    // - Multiple Textures on differnt Objects! (Same Shader!)
+    // - Normal Mapping
+    // - Moving Lights!
+    // - Toggable View! "(Enter/LShift)""
+    //
+
+    //Setting Details for the camera toogle. Either still or uses angle to rotate.
+    vec3 cameraPos = vec3(0.0f);
+    if (Scene1Toggle)
+    {
+        cameraPos = vec3(7.0f * cos(angle_2), 2.0f, 7.0f * sin(angle_2));
+        view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    }
+    else
+    {
+        cameraPos = vec3(5.5f * cos(90), 2.0f, 5.5f * sin(90));
+        view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    //Setting Shader To Use
+    Shader_1.use();
+
+    //Setting Lights Positions(Move Into Scenario1)
+    vec4 lightPos = vec4(10.0f * cos(angle_1), 20.0f, 10.0f * sin(angle_1), 6.0f);
+    Shader_1.setUniform("Light.Position", view * lightPos);
+        
+    //Setting Pass, This will ignore the texture, so it isnt on the floor!
+    Shader_1.setUniform("Pass", 1);
+
+    //Setting Models Location and Scale
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
+    setMatrices();
+    plane.render();
+
+    //Setting Pass 0 for Differnt Textures! Gray this one!
+    Shader_1.setUniform("Pass", 0);
+
+    //Setting Models Location and Scale
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(-2.0f, -0.45f, 0.0f));
+    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
+    setMatrices();
+    CarModelNormal->render();
+
+    //Uses differnt pass for differnt Texture! Pink & Blue!
+    Shader_1.setUniform("Pass", 2);
+
+    //Setting Models Location and Scale
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, -0.45f, 1.0f));
+    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
+    setMatrices();
+    CarModelNormal->render();
+
+    //Uses differnt pass for differnt Texture! Green & Pink!
+    Shader_1.setUniform("Pass", 3);
+
+    //Setting Models Location and Scale
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(2.0f, -0.45f, 2.0f));
+    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
+    setMatrices();
+    CarModelNormal->render();
+}
+
+void  SceneBasic_Uniform::Scenario_2()
+{
+    //
+    // - Alpha Discarding
+    // - BlinnPhong Shading
+    // - Lighting
+    // - Texturing Objects
+    //
+
+    //Setting View To Look At.
+    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+
+    //Setting Shader To Use
+    Shader_2.use();
+
+    //Sets Pass to Ignore Texture Coords method.
+    Shader_2.setUniform("Pass_2", 0);
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
+    model = glm::rotate(model, glm::radians((float)angle_1 * 6), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices2();
+    plane.render();
+
+    //Set Pass to Include Alpha Discarding
+    Shader_2.setUniform("Pass_2", 1);
+
+    //Render Object.
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
+    model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
+    model = glm::rotate(model, glm::radians((float)angle_1 * 6), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices2();
+    CarModel->render();
+}
+
+void  SceneBasic_Uniform::Scenario_3()
+{
+    // 
+    // - BlinnPhong Shading
+    // - Multiple Textures
+    // - Multiple Lighting
+    // - Texturing Objects
+    //
+
+    //Setting View to Look At.
+    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+
+    //Setting Shader To Use
+    Shader_3.use();
+
     //Sets Pass to Ignore Texture Coords method.
     Shader_3.setUniform("Pass_3", 1);
 
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
-    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians((float)angle_1 * 6), vec3(0.0f, 1.0f, 0.0f));
     setMatrices3();
     plane.render();
 
@@ -512,19 +530,21 @@ void  SceneBasic_Uniform::Scenario_3()
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
     model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
-    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians((float)angle_1 * 6), vec3(0.0f, 1.0f, 0.0f));
     setMatrices3();
     CarModel->render();
 }
 
 void  SceneBasic_Uniform::Scenario_4()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // 
     // - Toon Shading
-    // - Moving Lights
-    // - Fog (Issues With this)
+    // - Spotlight
+    // - Fog (May be broken on differnt Computers)
+    // - Changing Colour Light!
+    //
 
+    //Toggle for Fog (Doesnt work on all Machines)
     if (Scene4Toggle)
     {
         Shader_4.setUniform("Pass", 1);
@@ -534,19 +554,15 @@ void  SceneBasic_Uniform::Scenario_4()
         Shader_4.setUniform("Pass", 0);
     }
 
-    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
-        1.0f, 0.0f));
-
-    //Setting Shader To Use
+    //Set What to look At.
+    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    
     Shader_4.use();
 
-    vec4 lightPos = vec4(10.0f * cos(angle5), 10.0f, 10.0f * sin(angle5), 1.0f);
-    Shader_4.setUniform("Light.Position", view * lightPos);
-
-    //Setting Lights Colour
     Shader_4.setUniform("Light.L", vec3(Value3, Value2, Value));
     Shader_4.setUniform("Light.La", vec3(0.2f, 0.2f, 0.2f));
 
+    //Setting Materials Setting (Doesnt Like Being Moved Out of Method.)
     Shader_4.setUniform("Material.Kd", 0.2f, 0.55f, 0.9f);
     Shader_4.setUniform("Material.Ks", 0.95f, 0.95f, 0.95f);
     Shader_4.setUniform("Material.Ka", 0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f);
@@ -557,11 +573,17 @@ void  SceneBasic_Uniform::Scenario_4()
     Shader_4.setUniform("Fog.MinDist", 1.0f);
     Shader_4.setUniform("Fog.Color", vec3(0.8f, 0.8f, 0.8f));
 
+    //Setting Shader To Use
+    vec4 lightPos = vec4(10.0f * cos(angle_3), 10.0f, 10.0f * sin(angle_3), 1.0f);
+    Shader_4.setUniform("Light.Position", view * lightPos);
+
+    //Render Plane
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
     setMatrices4();
     plane.render();
 
+    //Render the Car.
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
     model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
@@ -572,62 +594,61 @@ void  SceneBasic_Uniform::Scenario_4()
 void  SceneBasic_Uniform::Scenario_5()
 {
     //
-    // This is Car 1, This will Display
-    // - Toon Shading
-    // - Spolight, Changes Colour
-    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f,
-        1.0f, 0.0f));
+    // - BlinnPhong Shading
+    // - Texturing
+    // - Multiple Lights
+    // - Spotlighting, Changes colour!
+    // - Texturing Objects
+    //
+
+    //Setting where to look.
+    view = glm::lookAt(vec3(-2.5f, 2.f, 2.0f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     //Setting Shader To Use
     Shader_5.use();
 
     //Setting Lights Positions
-    vec4 lightPos = vec4(10.0f * cos(angle), 20.0f, 10.0f * sin(angle), 6.0f);
+    vec4 lightPos = vec4(10.0f * cos(angle_1), 20.0f, 10.0f * sin(angle_1), 6.0f);
     Shader_5.setUniform("Light.Position", view * lightPos);
-    Shader_5.setUniform("Light.La", vec3(0.1f, 0.1f, 0.1f));
-    Shader_5.setUniform("Light.L", vec3(0.2f, 0.2f, 0.2f));
 
-    //Setting Material Values for Car/Plane
-    Shader_5.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
-    Shader_5.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
-    Shader_5.setUniform("Material.Kd", 0.2f, 0.2f, 0.2f);
-    Shader_5.setUniform("Material.Shininess", 180.0f);
-
+    //Setting Spot Light
     lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);
     Shader_5.setUniform("Spot.Position", vec3(view * lightPos));
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
     Shader_5.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
 
     Shader_5.setUniform("Spot.L", vec3(Value3, Value2, Value));
-    Shader_5.setUniform("Spot.La", vec3(0.2f));
-    Shader_5.setUniform("Spot.Exponent", 10.0f); //Blurry Around Circle
-    Shader_5.setUniform("Spot.CutOff", glm::radians(5.0f));  //Size of circle
 
+    //Changing pass to ignore Textures.
     Shader_5.setUniform("Pass", 0);
 
+    //Render Plane
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
-    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians((float)angle_1 * 6), vec3(0.0f, 1.0f, 0.0f));
     setMatrices5();
     plane.render();
 
-    //Set Pass to Include Alpha Discarding
+    //Set Pass to Include Texture
     Shader_5.setUniform("Pass", 1);
 
+    //Render Car.
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
     model = glm::scale(model, vec3(0.8f, 0.8f, 0.8f));
-    model = glm::rotate(model, glm::radians((float)angle * 6), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians((float)angle_1 * 6), vec3(0.0f, 1.0f, 0.0f));
     setMatrices5();
     CarModel->render();
 }
 
 void SceneBasic_Uniform::RenderSkyBox()
 {
+    //Set Skybox to Current.
     SkyBox.use();
 
     model = mat4(1.0f);
 
+    //Render Skybox.
     setMatricesSky();
     sky.render();
 }

@@ -2,16 +2,17 @@
 
 in vec3 Position;
 in vec3 Normal;
-in vec2 TexCoord;								//Coords of Texture
+in vec2 TexCoord;
 
+//Setting Locations of Diffuse and Moss Images.
 layout (location = 0) out vec4 FragColor;
-layout (binding = 0) uniform sampler2D CarImage;  //Texture 1
+layout (binding = 0) uniform sampler2D CarImage; 
 layout (binding = 2) uniform sampler2D AlphaTex;
 
-uniform float Alpha_Threshold;
-
+//Setting to ignre sections.
 uniform int Pass_2;
 
+//Set up light struct
 uniform struct LightInfo 
 {
   vec4 Position;
@@ -19,6 +20,7 @@ uniform struct LightInfo
   vec3 L;
 } Light;
 
+//Set up material Info
 uniform struct MaterialInfo 
 {
   vec3 Ks;  //Specular Reflectivity
@@ -28,7 +30,7 @@ uniform struct MaterialInfo
 } Material;
 
 //Normal BlinnPhong Model
-vec3 PhongModelNormal(vec3 position, vec3 normal)
+vec3 BlinnPhongNormal(vec3 position, vec3 normal)
 {
 	//Ambient
 	vec3 ambient = Material.Ka * Light.La;
@@ -50,8 +52,8 @@ vec3 PhongModelNormal(vec3 position, vec3 normal)
 
 	return ambient + Light.L * (diffuse + specular);
 }
-//ALPHA ONE
-vec3 PhongModel(vec3 position, vec3 normal)
+//Alpha Model
+vec3 Alpha(vec3 position, vec3 normal)
 {
 	//Texture Setting
 	vec3 texColor = texture(CarImage, TexCoord).rbg;
@@ -79,28 +81,31 @@ vec3 PhongModel(vec3 position, vec3 normal)
 
 void main()
 {
+	//setting Alpha Map
 	vec4 alphaMap = texture(AlphaTex, TexCoord).rgba;
-	float Threshold = normalize(Alpha_Threshold);
 
 	if (Pass_2 == 0)
 	{
-		FragColor = vec4(PhongModelNormal(Position, normalize(Normal)), 1);
+		FragColor = vec4(BlinnPhongNormal(Position, normalize(Normal)), 1);
 	}
 	if (Pass_2 == 1)
 	{
+		//if it lower than 0.15, thrown away.
 		if (alphaMap.a < (0.15))
 		{
 			discard;
 		}
 		else 
 		{
+			//if the current one is facing us.
 			if (gl_FrontFacing)
 			{
-				FragColor = vec4(PhongModel(Position, normalize(Normal)), 1);
+				FragColor = vec4(Alpha(Position, normalize(Normal)), 1);
 			}
+			//if its away, it is reversed.
 			else 
 			{
-				FragColor = vec4(PhongModel(Position, normalize(-Normal)), 1);
+				FragColor = vec4(Alpha(Position, normalize(-Normal)), 1);
 			}
 		}
 	}

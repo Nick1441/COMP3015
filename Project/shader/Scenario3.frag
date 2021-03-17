@@ -26,7 +26,7 @@ uniform struct MaterialInfo
 } Material;
 
 //MultiTexture Model
-vec3 TextureModel(vec3 position, vec3 normal, int LightNum)
+vec3 MultiTexture(vec3 position, vec3 normal, int LightNum)
 {
 	//Texture Setting
 	vec3 TexCar = texture(CarImage, TexCoord).rgb;
@@ -55,7 +55,7 @@ vec3 TextureModel(vec3 position, vec3 normal, int LightNum)
 }
 
 //Normal BlinnPhong Model
-vec3 PhongModel(vec3 position, vec3 normal, int LightNum)
+vec3 BlinnPhong(vec3 position, vec3 normal, int LightNum)
 {
 	//Ambient
 	vec3 ambient = Material.Ka * Light[LightNum].La;
@@ -84,10 +84,11 @@ void main()
 
 	if (Pass_3 == 0)
 	{
+		//Gets Normal and Texture and combines them.
 		for (int i = 0; i < 3; i++)
 		{
-			vec4 THIS = vec4(TextureModel(Position, normalize(Normal), i), 1);
-			vec4 IS = vec4(PhongModel(Position, normalize(Normal), i), 1);
+			vec4 THIS = vec4(MultiTexture(Position, normalize(Normal), i), 1);
+			vec4 IS = vec4(BlinnPhong(Position, normalize(Normal), i), 1);
 			FragColor = THIS + IS;
 		}
 	}
@@ -95,7 +96,7 @@ void main()
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			FragColor += vec4(PhongModel(Position, normalize(Normal), i), 1);
+			FragColor += vec4(BlinnPhong(Position, normalize(Normal), i), 1);
 		}
 	}
 

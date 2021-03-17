@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 
-//Helper
+//Helper Files
 #include "helper/glslprogram.h"
 #include "helper/texture.h"
 #include "helper/stb/stb_image.h"
@@ -15,12 +15,10 @@
 //Additional Files
 #include "Additional Files/drawable.h"
 #include "Additional Files/trianglemesh.h"
-#include "Additional Files/teapot.h"
 #include "Additional Files/aabb.h"
 #include "Additional Files/utils.h"
 #include "Additional Files/objmesh.h"
 #include "Additional files/plane.h"
-#include "Additional Files/cube.h"
 
 
 #include "helper/glutils.h"
@@ -32,31 +30,29 @@ using namespace std;
 class SceneBasic_Uniform : public Scene
 {
 private:
-    //GLSLProgram Shader_BlinnPhong;
-
     //Creating Each Shader Program.
     GLSLProgram Shader_1;
     GLSLProgram Shader_2;
     GLSLProgram Shader_3;
     GLSLProgram Shader_4;
     GLSLProgram Shader_5;
-    GLSLProgram Text;
 
+    //Creating Skybox Texture & Mesh
     SkyBox sky;
     GLSLProgram SkyBox;
 
-    float angle;
-    float angle2;
-    float angle3, angle5;
-    float tPrev;
-    float tPrev2;
+    //Angles Used for Objects Rotation
+    float angle_1, angle_2, angle_3;
+    float tPrev, tPrev2;
     float rotSpeed;
+
+    //Values for Changing Colours.
     float Value, Value2, Value3;
-    Plane plane;
-    unique_ptr<ObjMesh> CarModel;
-    unique_ptr<ObjMesh> CarModelNormal;
-    //unique_ptr<ObjMesh> StreetLamp1;
-    //Teapot teapot;
+
+    //Setting Models.
+    Plane plane;                                //Plane for Base
+    unique_ptr<ObjMesh> CarModel;               //Model Of Car - Texture
+    unique_ptr<ObjMesh> CarModelNormal;         //Model Of Car - Normal Mapping
 
     //Set Matricies For Each Shader.
     void setMatrices();
@@ -67,6 +63,9 @@ private:
 
     void setMatricesSky();
 
+    //This manages all of the non changing variables which can be set in Init.
+    void LoadShadersVariables();
+
     void compile();
 
 public:
@@ -76,15 +75,17 @@ public:
     void update(float t);
     void render();
     void resize(int, int);
+
+    //Checking for User Input/Rendering Skybox.
     void InputPressed(int);
     void RenderSkyBox();
-    void TextToScreen();
+
+    //Methods for Each Scenario.
     void Scenario_1();
     void Scenario_2();
     void Scenario_3();
     void Scenario_4();
     void Scenario_5();
-    void Scenario_6();
 };
 
 #endif // SCENEBASIC_UNIFORM_H

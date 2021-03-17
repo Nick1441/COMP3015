@@ -25,24 +25,30 @@ uniform mat4 MVP;
  
 void main()
 { 
+//Creating the normal and tangent, using normal and vertex.
 	vec3 norm = normalize( NormalMatrix * VertexNormal);
 	vec3 tang = normalize( NormalMatrix * vec3(VertexTangent));
 
+	//Created BiNormal using the cross product of norm and tang.
 	vec3 binormal = normalize( cross( norm, tang ) ) * VertexTangent.w;
-
-	 mat3 toObjectLocal = mat3(
+	
+	//Find the local of the Binormal/tang.
+	mat3 toObjectLocal = mat3(
 		 tang.x, binormal.x, norm.x,
 		 tang.y, binormal.y, norm.y,
 		tang.z, binormal.z, norm.z ) ;
 
-
 	vec3 pos = vec3( ModelViewMatrix * vec4(VertexPosition,1.0) );
 	
+	//Setting normal and pos, Used on normal blinnPhong.
 	Normal = normalize(NormalMatrix * VertexNormal);
 	Position = (ModelViewMatrix * vec4(VertexPosition, 1.0)).xyz;
+
+	//Used for setting Normal Map
 	LightDir = toObjectLocal * (Light.Position.xyz - pos);
 	ViewDir = toObjectLocal * normalize(-pos);
-
+	
+	//Pass in the TexCoords.
 	TexCoord = VertexTexCoord;
 	gl_Position = MVP * vec4(VertexPosition,1.0); 
 } 
